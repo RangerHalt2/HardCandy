@@ -59,6 +59,23 @@ public class CandyController : MonoBehaviour
         if (ingredients.Count < 2) return;
 
         GameObject newCandy = Instantiate(candyPrefab, candyTransform.position, Quaternion.identity);
+
+        //Pass the ingredient traits onto the candy so NPCs can check them when buying
+        Candy candy = newCandy.GetComponent<Candy>();
+        if (candy != null)
+        {
+            foreach (GameObject ingredient in ingredients)
+            {
+                CandyIngredient candyIngredient = ingredient.GetComponent<CandyIngredient>();
+                if (candyIngredient == null || candyIngredient.candyIngredient == null) continue;
+
+                foreach (Traits_ScriptableObjects trait in candyIngredient.candyIngredient.IngredientTraits)
+                {
+                    if (!candy.traits.Contains(trait)) candy.traits.Add(trait);
+                }
+            }
+        }
+
         ingredients.Clear();
     }
 
