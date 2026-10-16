@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
     private void HandleMovement()
     {
         // 1. Calculate target speed based on sprint state
-        float speed = walkSpeed * (inputHandler.SprintValue > 0f ? sprintMultiplier : 1f);
+        float speed = walkSpeed * (inputHandler.Is_Sprinting ? sprintMultiplier : 1f);
 
         // 2. Map input to local horizontal movement and convert to world space
         Vector3 inputDirection = new Vector3(inputHandler.MoveInput.x, 0f, inputHandler.MoveInput.y);
