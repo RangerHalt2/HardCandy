@@ -53,6 +53,7 @@ public class InputHandler : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
 
         RegisterActionMapping();
