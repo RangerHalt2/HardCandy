@@ -1,4 +1,7 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(InputHandler))]
@@ -15,12 +18,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float lookSensitivity = 0.1f;
     [SerializeField] private float maxLookAngle = 85f;
 
+    [Header("Interaction Settings")]
+    [SerializeField] private float interactRange = 3f;
+    [SerializeField] private LayerMask interactableMask;
+    [SerializeField] private float interactCooldown = 0.5f;
+    private bool canInteract = true;
+    private bool interactFail = false;
+
+
     private CharacterController characterController;
     private InputHandler inputHandler;
 
     private Vector3 currentMovement;
     private float verticalVelocity;
     private float cameraPitch = 0f;
+    
 
     private void Awake()
     {
@@ -36,6 +48,10 @@ public class PlayerController : MonoBehaviour
     {
         HandleMovement();
         HandleRotation();
+        if (inputHandler.ClickTriggered)
+        {
+            Interact();
+        }
     }
 
     private void HandleMovement()
@@ -97,5 +113,48 @@ public class PlayerController : MonoBehaviour
         {
             cameraTransform.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
         }
+    }
+
+    private void Interact()
+    {
+        if (!canInteract) return;
+
+        canInteract = false;
+
+        Transform cam = cameraTransform != null ? cameraTransform : (Camera.main != null ? Camera.main.transform : null);
+        if (cam == null)
+        {
+            Debug.LogWarning("No main camera found for interaction!");
+            return;
+        }
+
+        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableMask))
+        {
+            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+
+            if (interactable != null)
+            {
+                if (interactable.canInteract)
+                {
+                    interactable.Interact();
+                }
+                else
+                {
+                    if (interactable.denyText != null && interactable.denyText.Length > 0)
+                    {
+                        Debug.Log(interactable.denyText[0]);
+                    }
+                }
+            }
+        }
+        StartCoroutine(InteractionCooldown());
+    }
+
+    private IEnumerator InteractionCooldown()
+    {
+        yield return new WaitForSeconds(interactCooldown);
+        canInteract = true;
     }
 }
