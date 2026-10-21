@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
     {
         HandleMovement();
         HandleRotation();
-        if (inputHandler.ClickTriggered)
+        if (inputHandler.InteractTriggered)
         {
             Interact();
         }
@@ -130,7 +130,7 @@ public class PlayerController : MonoBehaviour
 
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableMask))
+        if (Physics.Raycast(ray, out RaycastHit hit, interactRange, interactableMask, QueryTriggerInteraction.Ignore))
         {
             IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
 
@@ -149,7 +149,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        StartCoroutine(InteractionCooldown());
+            StartCoroutine(InteractionCooldown());
     }
 
     private IEnumerator InteractionCooldown()

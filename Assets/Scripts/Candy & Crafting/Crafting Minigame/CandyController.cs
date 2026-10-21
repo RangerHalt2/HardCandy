@@ -78,7 +78,7 @@ public class CandyController : MonoBehaviour
 
     private void TryPickUp()
     {
-        Debug.Log("CANDY INGREDIENT - Trying PickUp\nPointer Position: " + m_handler.PointerPosition);
+        //Debug.Log("CANDY CONTROLLER - Trying PickUp\nPointer Position: " + m_handler.PointerPosition);
         Ray ray = cam.ScreenPointToRay(m_handler.PointerPosition);
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, ingredientLayer, QueryTriggerInteraction.Ignore)) return;
 
@@ -95,12 +95,12 @@ public class CandyController : MonoBehaviour
         // Keep the object from snapping its center to the cursor
         grabOffset = held.position - hit.point;
 
-        Debug.Log("CANDY INGREDIENT -\nheld is: " + held + "\nheldRb is: " + heldRb);
+        //Debug.Log("CANDY CONTROLLER -\nheld is: " + held + "\nheldRb is: " + heldRb);
     }
 
     private void Drag()
     {
-        Debug.Log("CANDY INGREDIENT - trying to drag candy ingredient");
+        //Debug.Log("CANDY CONTROLLER - trying to drag candy ingredient");
         Ray ray = cam.ScreenPointToRay(m_handler.PointerPosition);
         if (!dragPlane.Raycast(ray, out float distance)) return;
 
@@ -113,7 +113,7 @@ public class CandyController : MonoBehaviour
 
     void Drop()
     {
-        Debug.Log("CANDY INGREDIENT - try to drop");
+        //Debug.Log("CANDY CONTROLLER - try to drop");
         if (heldRb != null)
         {
             heldRb.isKinematic = false;  // let it fall onto the table

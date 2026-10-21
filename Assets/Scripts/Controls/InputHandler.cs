@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,6 +15,9 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private string jump = "Jump";
     [SerializeField] private string click = "Click";
     [SerializeField] private string point = "Point";
+    [SerializeField] private string hotbar = "Hotbar";
+    [SerializeField] private string scroll = "Scroll";
+    [SerializeField] private string interact = "Interact";
 
 
     [Header("Input Actions")]
@@ -23,6 +27,9 @@ public class InputHandler : MonoBehaviour
     public InputAction jumpAction { get; private set; }
     public InputAction clickAction { get; private set; }
     public InputAction pointAction { get; private set; }
+    public InputAction hotBarAction { get; private set; }
+    public InputAction scrollAction { get; private set; }
+    public InputAction interactAction { get; private set; }
 
     /*
     [Header("Input Action References")]
@@ -38,7 +45,11 @@ public class InputHandler : MonoBehaviour
     public bool Is_Sprinting { get; private set; }
     public bool JumpTriggered { get; private set; }
     public bool ClickTriggered { get; private set; }
+    public float ScrollValue { get; private set; }
+    public bool InteractTriggered { get; private set; }
     public Vector2 PointerPosition => pointAction.ReadValue<Vector2>();
+
+    public event Action<int> OnHotbarSelected;
 
     public static InputHandler Instance { get; private set; }
 
@@ -71,6 +82,9 @@ public class InputHandler : MonoBehaviour
         jumpAction = map.FindAction(jump);
         clickAction = map.FindAction(click);
         pointAction = map.FindAction(point);
+        hotBarAction = map.FindAction(hotbar);
+        scrollAction = map.FindAction(scroll);
+        interactAction = map.FindAction(interact);
     }
 
     private void RegisterInputActions()
@@ -89,7 +103,27 @@ public class InputHandler : MonoBehaviour
 
         clickAction.performed += context => ClickTriggered = true;
         clickAction.canceled += context => ClickTriggered = false;
+
+        hotBarAction.performed += OnHotbarPerformed;
+
+        scrollAction.performed += context => ScrollValue = context.ReadValue<float>();
+        scrollAction.canceled += context => ScrollValue = 0f;
+
+        interactAction.performed += context => InteractTriggered = true;
+        interactAction.canceled += context => InteractTriggered = false;
     }
+
+    #region Hotbar Event Handling
+
+    private void OnHotbarPerformed(InputAction.CallbackContext context)
+    {
+        // Index of the binding that triggered this: 0 for "1", 1 for "2", etc.
+        int slot = context.action.GetBindingIndexForControl(context.control);
+        OnHotbarSelected?.Invoke(slot);
+    }
+
+    #endregion
+
 
     private void OnEnable()
     {
@@ -99,6 +133,9 @@ public class InputHandler : MonoBehaviour
         jumpAction.Enable();
         clickAction.Enable();
         pointAction.Enable();
+        hotBarAction.Enable();
+        scrollAction.Enable();
+        interactAction.Enable();
     }
 
     private void OnDisable()
@@ -109,5 +146,8 @@ public class InputHandler : MonoBehaviour
         jumpAction.Disable();
         clickAction.Disable();
         pointAction.Disable();
+        hotBarAction.Disable();
+        scrollAction.Disable();
+        interactAction.Disable();
     }
 }
