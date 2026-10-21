@@ -13,13 +13,14 @@ public class CandyIngredient : MonoBehaviour, IPickUp, IInteractable
     [SerializeField] private Sprite inventoryImg;
     public Sprite InventoryImg => inventoryImg;
 
-    #region IInteractable addressments
+    #region IInteractable Addressments
     public bool canInteract { get; set; } = true;
 
     public string[] denyText { get; set; }
 
     public void Interact()
     {
+        if (!canInteract) return;
         PlayerInventory playerInventory = GameObject.FindAnyObjectByType<PlayerInventory>();
 
         if (playerInventory == null)

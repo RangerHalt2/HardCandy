@@ -6,9 +6,9 @@ using UnityEngine;
 public class PlayerInventory : MonoBehaviour
 {
     public GameObject[] inventory;
-    private int selectedInventorySlot = 0;
+    public int selectedInventorySlot { get; private set; }  = 0;
 
-    private GameObject itemInHand;
+    private GameObject itemInHand = null;
 
     private InputHandler inputs;
     private InventoryUIController UIInventoryController;
@@ -42,6 +42,18 @@ public class PlayerInventory : MonoBehaviour
         return isFull; //if the value is true this will change to false, 
     }
 
+    public void RemoveItemFromSlot(int slot)
+    {
+        UIInventoryController.RemoveSlotItem(slot);
+        if(slot == selectedInventorySlot)
+        {
+            itemInHand = null;
+        }
+
+        inventory[slot] = null;
+
+    }
+
     #region Picking Up an Item
 
     public void PickUpItem(GameObject item)
@@ -71,7 +83,7 @@ public class PlayerInventory : MonoBehaviour
         rb.isKinematic = true;
         item.transform.position = hand.position;
         item.transform.rotation = hand.rotation;
-        item.transform.SetParent(hand);
+        item.transform.SetParent(hand, true);
 
         IPickUp pickedItem = item.GetComponent<IPickUp>();
         if(pickedItem == null)
@@ -96,12 +108,30 @@ public class PlayerInventory : MonoBehaviour
             GameObject slot = inventory[i];
             if (slot == null)
             {
+                RemoveFromStashParent(item);
                 inventory[i] = item;
                 selectedInventorySlot = i; // automatically swap to the placed item
                 Debug.Log("PLAYER INVENTORY - found slot was: " + i);
                 SwapHeldItem();
                 return;
             }
+        }
+    }
+
+    //Clears the item from the stash parent
+    private void RemoveFromStashParent(GameObject item)
+    {
+        ItemStash stash = item.GetComponentInParent<ItemStash>();
+        if (stash == null) return; //there's no parent to remove from
+
+        int index = 0;
+        foreach(GameObject slot in stash.inventory)
+        {
+            if(slot == item)
+            {
+                stash.inventory[index] = null;
+            }
+            index++;
         }
     }
 
@@ -131,7 +161,7 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    private void SwapHeldItem()
+    public void SwapHeldItem()
     {
         if(itemInHand != null)
         {
