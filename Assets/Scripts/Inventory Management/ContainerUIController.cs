@@ -1,0 +1,89 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ContainerUIController : MonoBehaviour
+{
+    [SerializeField] private RectTransform playerInventoryParent;
+    [SerializeField] private RectTransform containerInventoryParent;
+    [SerializeField] private InventorySlotUI slotPrefab;   // was GameObject
+
+    private readonly List<InventorySlotUI> playerSlots = new List<InventorySlotUI>();
+    private readonly List<InventorySlotUI> containerSlots = new List<InventorySlotUI>();
+
+    private PlayerController pc;
+
+    private CandyController c_controller;
+    private bool hasCandyController = false;
+
+    // ItemStash implements IItemContainer, so existing callers passing an ItemStash still compile
+    public void SpawnInventorySlots(IItemContainer container)
+    {
+        c_controller = null;
+        hasCandyController = false;
+        PlayerInventory playerInventory = FindAnyObjectByType<PlayerInventory>();
+        pc = FindAnyObjectByType<PlayerController>();
+
+        if (playerInventory == null)
+        {
+            Debug.LogError("CONTAINER UI CONTROLLER - PLAYER INVENTORY NOT FOUND; RETURNING");
+            return;
+        }
+        if (pc == null)
+        {
+            Debug.LogError("CONTAINER UI CONTROLLER - the player controller could not be found; returning");
+            return;
+        }
+
+        ClearSlots();   // guards against opening twice without closing
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        pc.blockInputs = true;
+
+        if (container is Component c)
+        {
+            c_controller = c.GetComponentInParent<CandyController>();   // or GetComponent
+            if (c_controller != null) hasCandyController = true;
+        }
+
+        BuildGrid(playerInventoryParent, playerInventory, playerSlots);
+        BuildGrid(containerInventoryParent, container, containerSlots);
+    }
+
+    private void BuildGrid(RectTransform panel, IItemContainer container, List<InventorySlotUI> list)
+    {
+        RectTransform gridParent = panel.Find("Grid").GetComponent<RectTransform>();
+
+        for (int i = 0; i < container.Size; i++)
+        {
+            InventorySlotUI slot = Instantiate(slotPrefab, gridParent);
+            slot.Init(container, i);   // subscribes to SlotChanged and draws the current icon
+            list.Add(slot);
+        }
+    }
+
+    private void ClearSlots()
+    {
+        foreach (var s in playerSlots) if (s != null) Destroy(s.gameObject);
+        foreach (var s in containerSlots) if (s != null) Destroy(s.gameObject);
+        playerSlots.Clear();
+        containerSlots.Clear();
+    }
+
+    public void Exit()
+    {
+        ClearSlots();   // each slot unsubscribes from SlotChanged in OnDestroy
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (pc != null) pc.blockInputs = false;
+
+        if(c_controller != null && hasCandyController)
+        {
+            c_controller.Enter();
+        }
+
+        gameObject.SetActive(false);
+    }
+}

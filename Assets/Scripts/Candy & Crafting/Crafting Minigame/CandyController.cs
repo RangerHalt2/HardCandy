@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 
 public class CandyController : MonoBehaviour, IInteractable
 {
@@ -12,6 +13,8 @@ public class CandyController : MonoBehaviour, IInteractable
 
     private Camera playerCamera;
     [SerializeField] private Camera stationCamera;
+
+    private bool isCrafting = false;
 
     private Camera cam;
     private LayerMask ingredientLayer;
@@ -35,7 +38,8 @@ public class CandyController : MonoBehaviour, IInteractable
     public void Interact()
     {
         if (!canInteract) return;
-        Enter();
+        //Enter();
+        InventoryCheck();
     }
     #endregion
 
@@ -50,27 +54,34 @@ public class CandyController : MonoBehaviour, IInteractable
         }
     }
 
+    private void Update()
+    {
+        HandleIngredientPickUp();
+        HandleCreateCandy();
+        HandleEarlyExit();
+    }
+
+    #region Add Ingredients
+
+    #endregion
+
+    #region Pot Collision Handling
     [SerializeField] private TriggerRelay potTrigger;
     void OnEnable() => potTrigger.Entered += OnPotEntered;
     void OnDisable() => potTrigger.Entered -= OnPotEntered;
     void OnPotEntered(Collider other)
     {
-
+        if (!isCrafting) return;
         if (other.gameObject.CompareTag("Ingredient"))
         {
             ingredients.Add(other.gameObject);
             other.gameObject.SetActive(false);
         }
     }
-
-    private void Update()
-    {
-        HandleIngredientPickUp();
-        HandleCreateCandy();
-    }
+    #endregion
 
     #region Create Candy
-    
+
     private void HandleCreateCandy()
     {
         if (ingredients.Count < 2) return;
@@ -79,6 +90,12 @@ public class CandyController : MonoBehaviour, IInteractable
         Candy candyRef = newCandy.GetComponent<Candy>();
         candyRef.CandyName = DetermineCandyName();
         candyRef.traits = ApplyTraits();
+
+        ItemStash stashedInventory = GetComponent<ItemStash>();
+        for (int i = 0; i < stashedInventory.inventory.Length; i++)
+        {
+            stashedInventory.inventory[i] = null;
+        }
 
         ingredients.Clear();
         Exit();
@@ -128,8 +145,22 @@ public class CandyController : MonoBehaviour, IInteractable
 
     #endregion
 
-
-    private void Enter()
+    #region Enter/Exit Workbench Logic
+    
+    private void InventoryCheck()
+    {
+        ContainerUIController containerController = GameObject.FindAnyObjectByType<ContainerUIController>(FindObjectsInactive.Include);
+        if (containerController == null)
+        {
+            Debug.LogError("CANDY CONTROLLER - container ui controller not found and cannot be opened; returning.");
+            return;
+        }
+        containerController.gameObject.SetActive(true);
+        ItemStash itemStash = GetComponent<ItemStash>();
+        containerController.SpawnInventorySlots(itemStash);
+    }
+    
+    public void Enter()
     {
         playerCamera = Camera.main;
         playerCamera.enabled = false;
@@ -142,10 +173,11 @@ public class CandyController : MonoBehaviour, IInteractable
             Debug.LogError("CANDY CONTROLLER - THE PLAYER CONTROLLER COULD NOT BE FOUND");
             return;
         }
-        //pc.blockInputs = true;
+        pc.blockInputs = true;
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        isCrafting = true;
     }
 
     private void Exit()
@@ -160,15 +192,25 @@ public class CandyController : MonoBehaviour, IInteractable
             return;
         }
         pc.blockInputs = false;
+        isCrafting = false;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
+    private void HandleEarlyExit()
+    {
+        if(m_handler != null && m_handler.EscapeTriggered)
+        {
+            Exit();
+        }
+    }
+    #endregion
+
     #region Ingredient PickUp
     private void HandleIngredientPickUp()
     {
-        if (m_handler == null) return;
+        if (m_handler == null || !isCrafting) return;
 
         if (m_handler.ClickTriggered && (held == null && heldRb == null)) TryPickUp();
         if (m_handler.ClickTriggered && (held != null && heldRb != null)) Drag();
@@ -180,7 +222,7 @@ public class CandyController : MonoBehaviour, IInteractable
         //Debug.Log("CANDY CONTROLLER - Trying PickUp\nPointer Position: " + m_handler.PointerPosition);
         Ray ray = cam.ScreenPointToRay(m_handler.PointerPosition);
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, ingredientLayer, QueryTriggerInteraction.Ignore)) return;
-
+        Debug.DrawLine(ray.origin, hit.point, Color.red);
         held = hit.transform;
         heldRb = held.GetComponent<Rigidbody>();
         if (heldRb != null)

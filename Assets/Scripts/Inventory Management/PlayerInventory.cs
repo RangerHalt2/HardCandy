@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventory : MonoBehaviour, IItemContainer
 {
     public GameObject[] inventory;
     public int selectedInventorySlot { get; private set; }  = 0;
@@ -19,6 +19,51 @@ public class PlayerInventory : MonoBehaviour
 
     private float hotbarScrollTimer = 0f;
     [SerializeField] private float hotbarScrollCooldown = 0.5f;
+
+
+    #region IItemContainer
+
+    public event Action<int> SlotChanged;
+    public int Size => inventory.Length;
+    public GameObject GetItem(int i) => inventory[i];
+    public bool CanAccept(GameObject item) => true;
+
+    public void SetItem(int i, GameObject item)
+    {
+        inventory[i] = item;
+
+        if (item != null)
+        {
+            Rigidbody rb = item.GetComponentInChildren<Rigidbody>();
+            if (rb == null) rb = item.GetComponentInParent<Rigidbody>();
+            if (rb != null) rb.isKinematic = true;
+
+            item.transform.SetParent(hand, false);
+            item.transform.localPosition = Vector3.zero;
+            item.transform.localRotation = Quaternion.identity;
+            item.SetActive(i == selectedInventorySlot);
+        }
+
+        if (i == selectedInventorySlot) itemInHand = item;
+
+
+        if(item != null)
+        {
+            IPickUp pickedItem = inventory[i].GetComponent<IPickUp>();
+            if (pickedItem == null)
+            {
+                Debug.LogWarning("PLAYER INVENTORY - item should not be a pickup item");
+                return;
+            }
+
+            UIInventoryController.SelectSlot(i);
+            UIInventoryController.SetSlotSprite(i, pickedItem.InventoryImg);
+        }
+
+        SlotChanged?.Invoke(i);
+    }
+
+    #endregion
 
     private void Awake()
     {
@@ -51,18 +96,12 @@ public class PlayerInventory : MonoBehaviour
 
     public void RemoveItemFromSlot(int slot)
     {
-        UIInventoryController.RemoveSlotItem(slot);
-        if(slot == selectedInventorySlot)
-        {
-            itemInHand = null;
-        }
-
-        inventory[slot] = null;
-
+        UIInventoryController.RemoveSlotItem(slot);   // delete once the hotbar slots use InventorySlotUI
+        SetItem(slot, null);
     }
 
     #region Picking Up an Item
-
+    /*
     public void PickUpItem(GameObject item)
     {
         if (InventoryIsFull())
@@ -107,6 +146,38 @@ public class PlayerInventory : MonoBehaviour
         UIInventoryController.SetSlotSprite(selectedInventorySlot, pickedItem.InventoryImg);
 
     }
+    */
+
+    public void PickUpItem(GameObject item)
+    {
+        if (item == null) { Debug.LogWarning("PLAYER INVENTORY - Item is null; returning."); return; }
+        if (UIInventoryController == null) { Debug.LogError("PLAYER INVENTORY - UI INVENTORY COULD NOT BE FOUND"); return; }
+
+        int slot = FirstEmptySlot();
+        if (slot < 0) { Debug.Log("PLAYER INVENTORY - Inventory is full; preventing pick-up"); return; }
+
+        IPickUp pickedItem = item.GetComponent<IPickUp>();
+        if (pickedItem == null)
+        {
+            Debug.LogWarning("PLAYER INVENTORY - that item can't be picked up");
+            return;
+        }
+
+        RemoveFromStashParent(item);                  // must run BEFORE SetItem reparents it
+
+        if (itemInHand != null) itemInHand.SetActive(false);   // hide the old held item first
+        selectedInventorySlot = slot;                 // auto-select the new item
+        SetItem(slot, item);
+        UIInventoryController.SelectSlot(slot);
+        UIInventoryController.SetSlotSprite(slot, pickedItem.InventoryImg);
+    }
+
+    private int FirstEmptySlot()
+    {
+        for (int i = 0; i < inventory.Length; i++)
+            if (inventory[i] == null) return i;
+        return -1;
+    }
 
     private void PlaceItemInFirstSlot(GameObject item)
     {
@@ -129,17 +200,10 @@ public class PlayerInventory : MonoBehaviour
     private void RemoveFromStashParent(GameObject item)
     {
         ItemStash stash = item.GetComponentInParent<ItemStash>();
-        if (stash == null) return; //there's no parent to remove from
+        if (stash == null) return;
 
-        int index = 0;
-        foreach(GameObject slot in stash.inventory)
-        {
-            if(slot == item)
-            {
-                stash.inventory[index] = null;
-            }
-            index++;
-        }
+        for (int i = 0; i < stash.Size; i++)
+            if (stash.GetItem(i) == item) stash.SetItem(i, null);
     }
 
     #endregion
@@ -151,7 +215,8 @@ public class PlayerInventory : MonoBehaviour
     }
     void OnDisable() 
     {
-        InputHandler.Instance.OnHotbarSelected -= SelectSlot;
+        if (InputHandler.Instance != null)
+            InputHandler.Instance.OnHotbarSelected -= SelectSlot;
         subscribed = false;
     }
     void SelectSlot(int index) { selectedInventorySlot = index; SwapHeldItem(); }
@@ -177,20 +242,15 @@ public class PlayerInventory : MonoBehaviour
 
     public void SwapHeldItem()
     {
-        if(itemInHand != null)
-        {
-            itemInHand.SetActive(false);
-        }
+        if (itemInHand != null) itemInHand.SetActive(false);
 
-        if (inventory[selectedInventorySlot] != null)
-        {
-            inventory[selectedInventorySlot].SetActive(true);
-            itemInHand = inventory[selectedInventorySlot];
-        }
+        itemInHand = inventory[selectedInventorySlot];     // null if the slot is empty
+        if (itemInHand != null) itemInHand.SetActive(true);
+
         UIInventoryController.SelectSlot(selectedInventorySlot);
     }
 
-    
+
 
     #endregion
 

@@ -1,12 +1,40 @@
+using System;
 using UnityEngine;
-using static UnityEditor.Progress;
 
-public class ItemStash : MonoBehaviour, IInteractable
+public class ItemStash : MonoBehaviour, IInteractable, IItemContainer
 {
     [SerializeField] public GameObject[] inventory;
     [SerializeField] private int inventorySpace = 10;
-
     [SerializeField] private Transform[] inventorySlots;
+
+    #region IItemContainer
+    public event Action<int> SlotChanged;
+    public int Size => inventory.Length;
+    public GameObject GetItem(int i) => inventory[i];
+    public bool CanAccept(GameObject item) => true;
+
+    public void SetItem(int i, GameObject item)
+    {
+        inventory[i] = item;
+
+        if (item != null)
+        {
+            item.SetActive(true);   // items arriving from the hotbar may be inactive
+
+            Rigidbody rb = item.GetComponentInChildren<Rigidbody>();
+            if (rb == null) rb = item.GetComponentInParent<Rigidbody>();
+            CandyController c_controller = GetComponent<CandyController>();
+            if (rb != null && c_controller == null) rb.isKinematic = false;
+
+            item.transform.SetParent(inventorySlots[i], false);
+            item.transform.localPosition = Vector3.zero;
+            item.transform.localRotation = Quaternion.identity;
+        }
+
+        SlotChanged?.Invoke(i);
+    }
+    #endregion
+
 
     private void Awake()
     {
@@ -31,37 +59,29 @@ public class ItemStash : MonoBehaviour, IInteractable
     public void Interact()
     {
         if (!canInteract) return;
+        InventoryCheck();
+    }
 
-        if (InventoryIsFull())
+    private void InventoryCheck()
+    {
+        ContainerUIController containerController = GameObject.FindAnyObjectByType<ContainerUIController>(FindObjectsInactive.Include);
+        if (containerController == null)
         {
-            Debug.Log("ITEM STASH - inventory is full cannot place item in here");
+            Debug.LogError("ITEM STASH - container ui controller not found and cannot be opened; returning.");
             return;
         }
-
-        PlayerInventory playerInventory = GameObject.FindAnyObjectByType<PlayerInventory>();
-        int slot = playerInventory.selectedInventorySlot;
-
-        if (playerInventory.inventory[slot] != null) //If the player isn't holding anything nothing should happen
-        {
-            PlaceItemInFirstSlot((playerInventory.inventory[slot]));
-            playerInventory.RemoveItemFromSlot(slot);
-        }
+        containerController.gameObject.SetActive(true);
+        ItemStash itemStash = GetComponent<ItemStash>();
+        containerController.SpawnInventorySlots(itemStash);
     }
 
     private void PlaceItemInFirstSlot(GameObject item)
     {
         for (int i = 0; i < inventory.Length; i++)
         {
-            GameObject slot = inventory[i];
-            if (slot == null)
+            if (inventory[i] == null)
             {
-                inventory[i] = item;
-                Rigidbody rb = item.GetComponentInChildren<Rigidbody>();
-                if (rb == null) rb = item.GetComponentInParent<Rigidbody>();
-                rb.isKinematic = false;
-                item.transform.position = inventorySlots[i].position;
-                item.transform.rotation = inventorySlots[i].rotation;
-                item.transform.SetParent(inventorySlots[i], true);
+                SetItem(i, item);
                 return;
             }
         }

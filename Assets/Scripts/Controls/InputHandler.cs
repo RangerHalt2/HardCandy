@@ -18,6 +18,7 @@ public class InputHandler : MonoBehaviour
     [SerializeField] private string hotbar = "Hotbar";
     [SerializeField] private string scroll = "Scroll";
     [SerializeField] private string interact = "Interact";
+    [SerializeField] private string escape = "Exit";
 
 
     [Header("Input Actions")]
@@ -30,6 +31,7 @@ public class InputHandler : MonoBehaviour
     public InputAction hotBarAction { get; private set; }
     public InputAction scrollAction { get; private set; }
     public InputAction interactAction { get; private set; }
+    public InputAction escapeAction { get; private set; }
 
     /*
     [Header("Input Action References")]
@@ -47,6 +49,7 @@ public class InputHandler : MonoBehaviour
     public bool ClickTriggered { get; private set; }
     public float ScrollValue { get; private set; }
     public bool InteractTriggered { get; private set; }
+    public bool EscapeTriggered { get; private set; }
     public Vector2 PointerPosition => pointAction.ReadValue<Vector2>();
 
     public event Action<int> OnHotbarSelected;
@@ -85,6 +88,7 @@ public class InputHandler : MonoBehaviour
         hotBarAction = map.FindAction(hotbar);
         scrollAction = map.FindAction(scroll);
         interactAction = map.FindAction(interact);
+        escapeAction = map.FindAction(escape);
     }
 
     private void RegisterInputActions()
@@ -111,6 +115,9 @@ public class InputHandler : MonoBehaviour
 
         interactAction.performed += context => InteractTriggered = true;
         interactAction.canceled += context => InteractTriggered = false;
+
+        escapeAction.performed += context => EscapeTriggered = true;
+        escapeAction.canceled += context => EscapeTriggered = false;
     }
 
     #region Hotbar Event Handling
@@ -136,6 +143,7 @@ public class InputHandler : MonoBehaviour
         hotBarAction.Enable();
         scrollAction.Enable();
         interactAction.Enable();
+        escapeAction.Enable();
     }
 
     private void OnDisable()
@@ -149,5 +157,6 @@ public class InputHandler : MonoBehaviour
         hotBarAction.Disable();
         scrollAction.Disable();
         interactAction.Disable();
+        escapeAction.Disable();
     }
 }
