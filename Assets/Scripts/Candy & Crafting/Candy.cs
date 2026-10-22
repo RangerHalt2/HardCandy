@@ -30,7 +30,10 @@ public class Candy : MonoBehaviour, IInteractable, IPickUp
         playerInventory.PickUpItem(gameObject);
     }
     #endregion
-
+    public bool HasTrait(Traits_ScriptableObjects trait)
+    {
+        return trait != null && traits.Contains(trait);
+    }
 
 
 }
