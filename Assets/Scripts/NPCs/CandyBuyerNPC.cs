@@ -107,6 +107,21 @@ public class CandyBuyerNPC : MonoBehaviour
             playerMoney.CurrentMoney += price;
         }
 
+        PlayerInventory playerInventory = GameObject.FindAnyObjectByType<PlayerInventory>();
+        if (playerInventory != null)
+        {
+            int index = 0;
+            foreach(GameObject item in playerInventory.inventory)
+            {
+                if (item == null) continue; //no item to check
+                Candy slotCandy = item.GetComponent<Candy>();
+                if(slotCandy == candy) //Items are the same
+                {
+                    playerInventory.RemoveItemFromSlot(index);
+                }
+                index++;
+            }
+        }
         Destroy(candy.gameObject);
         return true;
     }

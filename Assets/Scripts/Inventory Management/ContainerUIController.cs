@@ -60,6 +60,10 @@ public class ContainerUIController : MonoBehaviour
             slot.Init(container, i);   // subscribes to SlotChanged and draws the current icon
             list.Add(slot);
         }
+
+        Debug.Log($"CONTAINER UI CONTROLLER - {gridParent.parent.name}/Grid: {gridParent.childCount} children, container Size = {container.Size}");
+        for (int i = 0; i < gridParent.childCount; i++)
+            Debug.Log($"CONTAINER UI CONTROLLER -  child {i}: {gridParent.GetChild(i).name}");
     }
 
     private void ClearSlots()

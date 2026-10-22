@@ -222,7 +222,6 @@ GameObject:
   - component: {fileID: 6181450060368633081}
   - component: {fileID: 2812451381680842493}
   - component: {fileID: 7178258975435826463}
-  - component: {fileID: 6880948583269479310}
   m_Layer: 5
   m_Name: SlotImage
   m_TagString: Untagged
@@ -287,15 +286,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6880948583269479310
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9179376216998994478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c872198d26898db4b8d65632229589df, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DragGhost
