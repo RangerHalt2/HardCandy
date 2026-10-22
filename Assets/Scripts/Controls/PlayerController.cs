@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private bool canInteract = true;
     private bool interactFail = false;
 
+    [HideInInspector] public bool blockInputs = false;
 
     private CharacterController characterController;
     private InputHandler inputHandler;
@@ -48,7 +49,7 @@ public class PlayerController : MonoBehaviour
     {
         HandleMovement();
         HandleRotation();
-        if (inputHandler.InteractTriggered)
+        if (inputHandler.InteractTriggered && !blockInputs)
         {
             Interact();
         }
@@ -56,6 +57,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
+        if (blockInputs) return;
         // 1. Calculate target speed based on sprint state
         float speed = walkSpeed * (inputHandler.Is_Sprinting ? sprintMultiplier : 1f);
 
@@ -80,6 +82,7 @@ public class PlayerController : MonoBehaviour
 
     void HandleJumping()
     {
+        if (blockInputs) return;
         if (characterController.isGrounded)
         {
             if (verticalVelocity < 0f)
@@ -100,6 +103,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleRotation()
     {
+        if (blockInputs) return;
         Vector2 look = inputHandler.LookInput * lookSensitivity;
 
         // Horizontal rotation: Rotate the player body left/right (Yaw)

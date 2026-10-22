@@ -13,6 +13,8 @@ public class PlayerInventory : MonoBehaviour
     private InputHandler inputs;
     private InventoryUIController UIInventoryController;
 
+    private bool subscribed = false;
+
     [SerializeField] private Transform hand;
 
     private float hotbarScrollTimer = 0f;
@@ -23,6 +25,11 @@ public class PlayerInventory : MonoBehaviour
         inventory = new GameObject[9];
         inputs = GameObject.FindAnyObjectByType<InputHandler>();
         UIInventoryController = GameObject.FindAnyObjectByType<InventoryUIController>();
+    }
+
+    private void Start()
+    {
+        if (!subscribed) { InputHandler.Instance.OnHotbarSelected += SelectSlot; subscribed = true; }
     }
 
     private void Update()
@@ -138,8 +145,15 @@ public class PlayerInventory : MonoBehaviour
     #endregion
 
     #region HotBar Handling
-    void OnEnable() => InputHandler.Instance.OnHotbarSelected += SelectSlot;
-    void OnDisable() => InputHandler.Instance.OnHotbarSelected -= SelectSlot;
+    void OnEnable()
+    {
+        if (InputHandler.Instance != null && !subscribed) { InputHandler.Instance.OnHotbarSelected += SelectSlot; subscribed = true; }
+    }
+    void OnDisable() 
+    {
+        InputHandler.Instance.OnHotbarSelected -= SelectSlot;
+        subscribed = false;
+    }
     void SelectSlot(int index) { selectedInventorySlot = index; SwapHeldItem(); }
     private void HandleHotbarScrolling()
     {

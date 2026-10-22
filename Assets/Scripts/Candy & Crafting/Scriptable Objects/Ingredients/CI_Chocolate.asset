@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CandyItem_ScriptableObjects
   IngredientName: Bag of Sugar
   IngredientTraits:
-  - {fileID: 11400000, guid: 3704fc041c6d04a40aa1c82f26120b6a, type: 2}
+  - {fileID: 11400000, guid: cafa91f80272ba242a9b680ca34ad54d, type: 2}
   model: {fileID: -3710946204072402593, guid: 01d3e6a9b8b8e87498801f2e8810f243, type: 3}

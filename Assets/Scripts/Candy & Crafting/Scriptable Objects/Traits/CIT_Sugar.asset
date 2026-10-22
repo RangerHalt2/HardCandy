@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: CIT_Sugar
   m_EditorClassIdentifier: Assembly-CSharp::Traits_ScriptableObjects
   TraitName: Sugar
+  TraitNameMod: Sweet
   TraitDescription: Sweet sweet sweet there's nothing more candy than Sugar!

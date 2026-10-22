@@ -3,12 +3,15 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-public class CandyController : MonoBehaviour
+public class CandyController : MonoBehaviour, IInteractable
 {
 
     [SerializeField] private List<GameObject> ingredients;
     [SerializeField] private GameObject candyPrefab;
     [SerializeField] private Transform candyTransform;
+
+    private Camera playerCamera;
+    [SerializeField] private Camera stationCamera;
 
     private Camera cam;
     private LayerMask ingredientLayer;
@@ -24,6 +27,18 @@ public class CandyController : MonoBehaviour
     private Plane dragPlane;
     private Vector3 grabOffset;
 
+    #region IInteractable Addressments
+    public bool canInteract { get; set; } = true;
+
+    public string[] denyText { get; set; }
+
+    public void Interact()
+    {
+        if (!canInteract) return;
+        Enter();
+    }
+    #endregion
+
     private void Start()
     {
         m_handler = GameObject.FindAnyObjectByType<InputHandler>().GetComponent<InputHandler>();
@@ -35,8 +50,10 @@ public class CandyController : MonoBehaviour
         }
     }
 
-    //The attached collider right now just triggers if an ingredient touches the collider that's set on the workstation, this will need to change when it becomes more complicated
-    private void OnTriggerEnter(Collider other)
+    [SerializeField] private TriggerRelay potTrigger;
+    void OnEnable() => potTrigger.Entered += OnPotEntered;
+    void OnDisable() => potTrigger.Entered -= OnPotEntered;
+    void OnPotEntered(Collider other)
     {
 
         if (other.gameObject.CompareTag("Ingredient"))
@@ -59,12 +76,94 @@ public class CandyController : MonoBehaviour
         if (ingredients.Count < 2) return;
 
         GameObject newCandy = Instantiate(candyPrefab, candyTransform.position, Quaternion.identity);
+        Candy candyRef = newCandy.GetComponent<Candy>();
+        candyRef.CandyName = DetermineCandyName();
+        candyRef.traits = ApplyTraits();
+
         ingredients.Clear();
+        Exit();
     }
 
+    private List<Traits_ScriptableObjects> ApplyTraits()
+    {
+        List<Traits_ScriptableObjects> ret = new List<Traits_ScriptableObjects>();
+        foreach (GameObject ingredient in ingredients)
+        {
+            CandyIngredient candyIngredient = ingredient.GetComponent<CandyIngredient>();
+            CandyItem_ScriptableObjects candyIngredientScriptable = candyIngredient.candyIngredient;
+
+            foreach (Traits_ScriptableObjects trait in candyIngredientScriptable.IngredientTraits)
+            {
+                if (trait != null)
+                {
+                    ret.Add(trait);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private string DetermineCandyName()
+    {
+        string ret = "";
+
+        foreach (GameObject ingredient in ingredients)
+        {
+            CandyIngredient candyIngredient = ingredient.GetComponent<CandyIngredient>();
+            CandyItem_ScriptableObjects candyIngredientScriptable = candyIngredient.candyIngredient;
+            
+            foreach(Traits_ScriptableObjects trait in candyIngredientScriptable.IngredientTraits)
+            {
+                if (trait != null)
+                {
+                    ret += trait.TraitNameMod;
+                    ret += " ";
+                }
+            }
+        }
+        ret += "Candy";
+
+        return ret;
+    }
 
     #endregion
 
+
+    private void Enter()
+    {
+        playerCamera = Camera.main;
+        playerCamera.enabled = false;
+        stationCamera.enabled = true;
+
+        //Tell the player controller to not be in use
+        PlayerController pc = GameObject.FindAnyObjectByType<PlayerController>();
+        if (pc == null)
+        {
+            Debug.LogError("CANDY CONTROLLER - THE PLAYER CONTROLLER COULD NOT BE FOUND");
+            return;
+        }
+        //pc.blockInputs = true;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    private void Exit()
+    {
+        stationCamera.enabled = false;
+        playerCamera.enabled = true;
+
+        PlayerController pc = GameObject.FindAnyObjectByType<PlayerController>();
+        if (pc == null)
+        {
+            Debug.LogError("CANDY CONTROLLER - THE PLAYER CONTROLLER COULD NOT BE FOUND");
+            return;
+        }
+        pc.blockInputs = false;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
 
     #region Ingredient PickUp
     private void HandleIngredientPickUp()

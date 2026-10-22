@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: CIT_Sour
   m_EditorClassIdentifier: Assembly-CSharp::Traits_ScriptableObjects
   TraitName: Sour
+  TraitNameMod: Sour
   TraitDescription: It's sour, not bitter! When it's combined with sweets it creates a flavor so addictive!

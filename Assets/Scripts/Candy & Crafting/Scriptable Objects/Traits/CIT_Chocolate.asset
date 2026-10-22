@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: CIT_Chocolate
   m_EditorClassIdentifier: Assembly-CSharp::Traits_ScriptableObjects
   TraitName: Chocolate
+  TraitNameMod: Chocolatey
   TraitDescription: a rich coco flavored and embraces the essence of chocolate!
