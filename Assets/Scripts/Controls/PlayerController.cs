@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 [RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(InputHandler))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -38,15 +37,22 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
-        inputHandler = GetComponent<InputHandler>();
 
         // Lock and hide cursor for standard first-person gameplay
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
+    private void Start()
+    {
+        // InputHandler is a singleton on its own object, grab it here so its Awake has already run
+        inputHandler = InputHandler.Instance;
+    }
+
     private void Update()
     {
+        if (inputHandler == null) return;
+
         HandleMovement();
         HandleRotation();
         if (inputHandler.InteractTriggered && !blockInputs)
