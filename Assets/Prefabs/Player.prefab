@@ -153,6 +153,7 @@ GameObject:
   - component: {fileID: 6704162633795106111}
   - component: {fileID: 7183422325505634274}
   - component: {fileID: 477782658060163201}
+  - component: {fileID: 25003881991882133}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -322,6 +323,24 @@ MonoBehaviour:
   inventory: []
   hand: {fileID: 2379843167742000736}
   hotbarScrollCooldown: 0.5
+--- !u!114 &25003881991882133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7800321505212634940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cff67915f61e4dd4681ad78dbfb55dbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionPrompt
+  range: 3
+  mask:
+    serializedVersion: 2
+    m_Bits: 192
+  promptUI: {fileID: 0}
+  checkInterval: 0.05
 --- !u!1 &8853369369177774905
 GameObject:
   m_ObjectHideFlags: 0
