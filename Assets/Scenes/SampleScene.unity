@@ -994,6 +994,7 @@ GameObject:
   - component: {fileID: 1154415222}
   - component: {fileID: 1154415221}
   - component: {fileID: 1154415225}
+  - component: {fileID: 1154415226}
   m_Layer: 6
   m_Name: CandyDefault
   m_TagString: Untagged
@@ -1121,6 +1122,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1154415226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1154415220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55f1d631cf3c4e64dbaa7f2b6d916ffe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Candy
+  candyName: Candy
+  traits: []
 --- !u!1 &1580008918
 GameObject:
   m_ObjectHideFlags: 0
