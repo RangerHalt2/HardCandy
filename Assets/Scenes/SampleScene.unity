@@ -373,6 +373,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &363613230
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3271856769274980896, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_Name
+      value: CandySugar_Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 14.749112
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.8535066
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4762958088696193730, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 28878e35c8da4ba892d74cd23453daf5, type: 3}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -990,7 +1047,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CandyBuyerNPC
   npcName: Gus
   isCandyBuyer: 1
-  isContact: 0
+  isContact: 1
   taste: {fileID: 11400000, guid: 9ae07b65a30fe85499588e29625fea6a, type: 2}
   basePrice: 5
   favoriteBonus: 5
@@ -2013,3 +2070,4 @@ SceneRoots:
   - {fileID: 4611203866902048186}
   - {fileID: 304619621863470449}
   - {fileID: 2095349701}
+  - {fileID: 363613230}
