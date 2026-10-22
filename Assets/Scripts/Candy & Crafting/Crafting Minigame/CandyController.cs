@@ -14,7 +14,7 @@ public class CandyController : MonoBehaviour, IInteractable
     private Camera playerCamera;
     [SerializeField] private Camera stationCamera;
 
-    private bool isCrafting = false;
+    [SerializeField] private bool isCrafting = false;
 
     private Camera cam;
     private LayerMask ingredientLayer;
@@ -220,7 +220,7 @@ public class CandyController : MonoBehaviour, IInteractable
     private void TryPickUp()
     {
         //Debug.Log("CANDY CONTROLLER - Trying PickUp\nPointer Position: " + m_handler.PointerPosition);
-        Ray ray = cam.ScreenPointToRay(m_handler.PointerPosition);
+        Ray ray = stationCamera.ScreenPointToRay(m_handler.PointerPosition);
         if (!Physics.Raycast(ray, out RaycastHit hit, 100f, ingredientLayer, QueryTriggerInteraction.Ignore)) return;
         Debug.DrawLine(ray.origin, hit.point, Color.red);
         held = hit.transform;
@@ -231,7 +231,7 @@ public class CandyController : MonoBehaviour, IInteractable
         }
 
         // Plane perpendicular to the camera's forward, passing through the grab point
-        dragPlane = new Plane(-cam.transform.forward, hit.point);
+        dragPlane = new Plane(-stationCamera.transform.forward, hit.point);
 
         // Keep the object from snapping its center to the cursor
         grabOffset = held.position - hit.point;
@@ -242,7 +242,7 @@ public class CandyController : MonoBehaviour, IInteractable
     private void Drag()
     {
         //Debug.Log("CANDY CONTROLLER - trying to drag candy ingredient");
-        Ray ray = cam.ScreenPointToRay(m_handler.PointerPosition);
+        Ray ray = stationCamera.ScreenPointToRay(m_handler.PointerPosition);
         if (!dragPlane.Raycast(ray, out float distance)) return;
 
         Vector3 target = ray.GetPoint(distance) + grabOffset;
