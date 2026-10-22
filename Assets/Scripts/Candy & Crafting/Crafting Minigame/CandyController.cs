@@ -200,7 +200,7 @@ public class CandyController : MonoBehaviour, IInteractable
 
     private void HandleEarlyExit()
     {
-        if(m_handler != null && m_handler.EscapeTriggered)
+        if(m_handler != null && m_handler.EscapeTriggered && isCrafting)
         {
             Exit();
         }
