@@ -43,7 +43,7 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
-        if(input_manager.ClickTriggered && isManuallyContinuing)
+        if(input_manager.ClickTriggered && isManuallyContinuing && isActive)
         {
             input_manager.ClickTriggered = false;
             if(isActive)
