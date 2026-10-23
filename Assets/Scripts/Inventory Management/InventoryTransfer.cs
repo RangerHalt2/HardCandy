@@ -1,16 +1,19 @@
 using UnityEngine;
 
-public class TransferRule : MonoBehaviour
+public static class InventoryTransfer
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static bool Move(InventorySlotUI from, InventorySlotUI to)
     {
-        
-    }
+        Debug.Log("INVENTORY TRANSFER - Move called");
+        GameObject a = from.Container.GetItem(from.Index);
+        GameObject b = to.Container.GetItem(to.Index);
+        if (a == null) return false;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (!to.Container.CanAccept(a)) return false;
+        if (b != null && !from.Container.CanAccept(b)) return false;   // swap must be legal both ways
+
+        from.Container.SetItem(from.Index, b);   // b may be null (plain move)
+        to.Container.SetItem(to.Index, a);
+        return true;
     }
 }

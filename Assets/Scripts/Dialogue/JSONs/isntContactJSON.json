@@ -24,7 +24,8 @@
 			"speakerName": "Prisoner",
 			"sentence": "Listen up, bring me some candy and I'll have some cash for you.'",
 			"choices": [],
-			"nextLineIndex": -1
+			"nextLineIndex": -1,
+			"outcome": true
 		}
 	]
 }

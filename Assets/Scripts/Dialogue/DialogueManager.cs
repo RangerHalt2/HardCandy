@@ -196,7 +196,7 @@ public class DialogueManager : MonoBehaviour
     private void EndDialogue()
     {
         Debug.Log("DIALOGUE MANAGER - ending the dialogue");
-        string leadsTo = currentDialogue.lines[currentLineIndex].leadsTo;
+        bool shouldOutcome = currentDialogue.lines[currentLineIndex].outcome;
         dialogue_canvas.gameObject.SetActive(false);
         game_canvas.gameObject.SetActive(true);
         isActive = false;
@@ -207,7 +207,8 @@ public class DialogueManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        HandleDialogueOutcome();
+        if(shouldOutcome)
+            HandleDialogueOutcome();
 
         return;
     }

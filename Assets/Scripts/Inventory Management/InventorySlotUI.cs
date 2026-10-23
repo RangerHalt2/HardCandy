@@ -59,7 +59,7 @@ public class InventorySlotUI : MonoBehaviour,
         if (e.pointerDrag == null) return;
         var from = e.pointerDrag.GetComponent<InventorySlotUI>();
         if (from == null || from == this) return;
-        InventoryTransfer.Move(from, this);
+        if (!InventoryTransfer.Move(from, this)) return;
         
         if(from.Container is PlayerInventory pi)
         {

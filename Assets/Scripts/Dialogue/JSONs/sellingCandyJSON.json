@@ -6,14 +6,19 @@
 			"choices": [
 				{
 					"choiceText": "Yeah, I got that candy.",
-					"nextLineIndex": -1,
-					"leadsTo":  ""
+					"nextLineIndex": 1
 				},
 				{
 					"choiceText": "Ahh not yet, sorry...",
 					"nextLineIndex": -1
 				}
 			]
+		},
+		{
+			"speakerName": "Prisoner",
+			"sentence": "I'll give you extra if it's my favorite",
+			"nextLineIndex": -1,
+			"outcome": true
 		}
 	]
 }
