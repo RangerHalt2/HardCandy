@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; 
 
 public class ContainerUIController : MonoBehaviour
 {
@@ -14,6 +15,10 @@ public class ContainerUIController : MonoBehaviour
 
     private CandyController c_controller;
     private bool hasCandyController = false;
+    private ISellContainer sellContainer;
+    private SaleContainer saleContainer;
+
+    [SerializeField] private Button sellButton;
 
     // ItemStash implements IItemContainer, so existing callers passing an ItemStash still compile
     public void SpawnInventorySlots(IItemContainer container)
@@ -42,6 +47,17 @@ public class ContainerUIController : MonoBehaviour
 
         ClearSlots();   // guards against opening twice without closing
 
+        sellButton.onClick.RemoveAllListeners();
+        if (container is ISellContainer seller)
+        {
+            sellButton.gameObject.SetActive(true);
+            sellButton.onClick.AddListener(seller.Sell);
+        }
+        else
+        {
+            sellButton.gameObject.SetActive(false);     // stashes and the workbench don't show it
+        }
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         pc.blockInputs = true;
@@ -51,6 +67,8 @@ public class ContainerUIController : MonoBehaviour
             c_controller = c.GetComponentInParent<CandyController>();   // or GetComponent
             if (c_controller != null) hasCandyController = true;
         }
+        sellContainer = container as ISellContainer;
+        saleContainer = container as SaleContainer;
 
         BuildGrid(playerInventoryParent, playerInventory, playerSlots);
         BuildGrid(containerInventoryParent, container, containerSlots);
@@ -84,6 +102,9 @@ public class ContainerUIController : MonoBehaviour
     {
         ClearSlots();   // each slot unsubscribes from SlotChanged in OnDestroy
 
+        sellButton.onClick.RemoveAllListeners();
+        sellButton.gameObject.SetActive(false);
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -103,8 +124,8 @@ public class ContainerUIController : MonoBehaviour
             }
         }
 
+        if (saleContainer != null ) saleContainer.ReturnUnsoldItems();
 
-
-            gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

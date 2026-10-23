@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 //NPCs start as strangers. Once the player meets them they become a contact, and after that they'll buy candy from the player
@@ -27,8 +28,9 @@ public class CandyBuyerNPC : MonoBehaviour, IInteractable
     [SerializeField] private TextAsset notBuyingCandyJSON;
     [SerializeField] private TextAsset isntContactJSON;
     [SerializeField] private TextAsset buyingCandyJSON;
-    
 
+    private ContainerUIController containerUI;
+    private SaleContainer saleContainer;
 
     private PlayerMoney playerMoney;
 
@@ -36,6 +38,10 @@ public class CandyBuyerNPC : MonoBehaviour, IInteractable
     {
         playerMoney = FindAnyObjectByType<PlayerMoney>();
         dialogueTriggerer = GetComponent<DialogueTrigger>();
+
+        saleContainer = GetComponent<SaleContainer>();
+        if (containerUI == null)
+            containerUI = FindAnyObjectByType<ContainerUIController>(FindObjectsInactive.Include);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -165,6 +171,26 @@ public class CandyBuyerNPC : MonoBehaviour, IInteractable
     public void SellCandy()
     {
         Debug.Log("CANDY BUYING NPC - the dialogue routes correctly to attempt to sell a candy");
+        StartCoroutine(OpenSaleUI());
+    }
+
+    private IEnumerator OpenSaleUI()
+    {
+        yield return null;                       // let the dialogue finish closing first
+        containerUI = GameObject.FindAnyObjectByType<ContainerUIController>(FindObjectsInactive.Include);
+        if (containerUI == null)
+        {
+            Debug.LogError("CANDY BUYING NPC - container ui controller not found and cannot be opened; yield breaking.");
+            yield break;
+        }
+        containerUI.gameObject.SetActive(true);
+        containerUI.SpawnInventorySlots(saleContainer);
+    }
+
+    public int GetOffer(Candy candy)
+    {
+        if (Refuses(candy)) return 0;
+        return IsFavorite(candy) ? basePrice + favoriteBonus : basePrice;
     }
 
     public bool Refuses(Candy candy)
