@@ -18,6 +18,12 @@ public class ContainerUIController : MonoBehaviour
     // ItemStash implements IItemContainer, so existing callers passing an ItemStash still compile
     public void SpawnInventorySlots(IItemContainer container)
     {
+        InteractionPrompt prompt = GameObject.FindAnyObjectByType<InteractionPrompt>();
+        if (prompt != null)
+        {
+            prompt.canShowPrompt = false;
+            prompt.TogglePrompt();
+        }
         c_controller = null;
         hasCandyController = false;
         PlayerInventory playerInventory = FindAnyObjectByType<PlayerInventory>();
@@ -87,7 +93,18 @@ public class ContainerUIController : MonoBehaviour
         {
             c_controller.Enter();
         }
+        else
+        {
+            InteractionPrompt prompt = GameObject.FindAnyObjectByType<InteractionPrompt>();
+            if (prompt != null)
+            {
+                prompt.canShowPrompt = true;
+                prompt.lastCollider = null;
+            }
+        }
 
-        gameObject.SetActive(false);
+
+
+            gameObject.SetActive(false);
     }
 }

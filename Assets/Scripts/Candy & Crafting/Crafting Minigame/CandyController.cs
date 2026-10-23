@@ -196,6 +196,13 @@ public class CandyController : MonoBehaviour, IInteractable
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        InteractionPrompt prompt = GameObject.FindAnyObjectByType<InteractionPrompt>();
+        if (prompt != null)
+        {
+            prompt.canShowPrompt = true;
+            prompt.lastCollider = null;
+        }
     }
 
     private void HandleEarlyExit()

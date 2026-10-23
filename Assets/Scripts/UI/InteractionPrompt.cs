@@ -8,10 +8,12 @@ public class InteractionPrompt : MonoBehaviour
     private GameObject promptUI;
     [SerializeField] private float checkInterval = 0.05f;  // 20 checks per second
 
-    private Collider lastCollider;
+    [HideInInspector] public Collider lastCollider;
     private IInteractable current;
     private bool shown;
     private float timer;
+
+    [HideInInspector] public bool canShowPrompt = true;
 
     private void Start()
     {
@@ -23,6 +25,7 @@ public class InteractionPrompt : MonoBehaviour
             return;
         }
         promptUI.SetActive(false);
+        canShowPrompt = true;
     }
 
     void Update()
@@ -31,7 +34,7 @@ public class InteractionPrompt : MonoBehaviour
         if (timer > 0f) return;
         timer = checkInterval;
 
-        Check();
+        if(canShowPrompt) Check();
     }
 
     void Check()
@@ -59,6 +62,17 @@ public class InteractionPrompt : MonoBehaviour
             promptUI.SetActive(shown);
         }
     }
+
+    public void TogglePrompt()
+    {
+        if (promptUI != null)
+        {
+            shown = !shown;
+            promptUI.SetActive(shown);
+        }
+    }
+
+    
 
     void OnDisable()
     {
