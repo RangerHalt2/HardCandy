@@ -46,7 +46,7 @@ public class InputHandler : MonoBehaviour
     public Vector2 LookInput { get; private set; }
     public bool Is_Sprinting { get; private set; }
     public bool JumpTriggered { get; private set; }
-    public bool ClickTriggered { get; private set; }
+    public bool ClickTriggered { get; set; }
     public float ScrollValue { get; private set; }
     public bool InteractTriggered { get; private set; }
     public bool EscapeTriggered { get; private set; }
