@@ -2,7 +2,7 @@ using UnityEngine;
 
 //NPCs start as strangers. Once the player meets them they become a contact, and after that they'll buy candy from the player
 //Needs a trigger collider on the NPC so the player (tagged "Player") and candy can be detected
-public class CandyBuyerNPC : MonoBehaviour
+public class CandyBuyerNPC : MonoBehaviour, IInteractable
 {
     [Header("NPC Info")]
     public string npcName = "Stranger";
@@ -20,15 +20,27 @@ public class CandyBuyerNPC : MonoBehaviour
     [SerializeField] private int basePrice = 5;
     [SerializeField] private int favoriteBonus = 5;
 
+
+    [Header("Dialogue Related")]
+    private DialogueTrigger dialogueTriggerer;
+    private IDialogueOutcome dialogueOutcome;
+    [SerializeField] private TextAsset notBuyingCandyJSON;
+    [SerializeField] private TextAsset isntContactJSON;
+    [SerializeField] private TextAsset buyingCandyJSON;
+    
+
+
     private PlayerMoney playerMoney;
 
     private void Start()
     {
         playerMoney = FindAnyObjectByType<PlayerMoney>();
+        dialogueTriggerer = GetComponent<DialogueTrigger>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        /*
         if (other.CompareTag("Player"))
         {
             MeetPlayer();
@@ -41,7 +53,20 @@ public class CandyBuyerNPC : MonoBehaviour
         {
             TrySellCandy(candy);
         }
+        */
     }
+
+    #region Interactable
+    public bool canInteract { get; set; } = true;
+
+    public string[] denyText { get; set; }
+
+    public void Interact()
+    {
+        if (!canInteract) return;
+        TalkToNPC();
+    }
+    #endregion
 
     #region Contact
 
@@ -68,8 +93,8 @@ public class CandyBuyerNPC : MonoBehaviour
 
     #region Buying
 
-    //Returns true if the NPC bought the candy. The candy object is destroyed on a sale
-    public bool TrySellCandy(Candy candy)
+    //Obsolete function for roll back in case.
+    /*public bool TrySellCandy(Candy candy)
     {
         if (candy == null) return false;
 
@@ -124,6 +149,22 @@ public class CandyBuyerNPC : MonoBehaviour
         }
         Destroy(candy.gameObject);
         return true;
+    }
+    */
+
+    private void TalkToNPC()
+    {
+        if (!isCandyBuyer) dialogueTriggerer.SetDialogueJSON(notBuyingCandyJSON);
+        else if (!isContact) { dialogueTriggerer.SetDialogueJSON(isntContactJSON); dialogueOutcome = GetComponent<CreateContactOutcome>(); }
+        else { dialogueTriggerer.SetDialogueJSON(buyingCandyJSON); dialogueOutcome = GetComponent<SellCandyOutcome>();  }
+
+        Debug.Log("CANDY BUYING NPC - dialogueOutcome passed: " + dialogueOutcome);
+        dialogueTriggerer.StartDialogue(dialogueOutcome);
+    }
+
+    public void SellCandy()
+    {
+        Debug.Log("CANDY BUYING NPC - the dialogue routes correctly to attempt to sell a candy");
     }
 
     public bool Refuses(Candy candy)

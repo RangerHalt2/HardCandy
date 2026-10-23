@@ -1,0 +1,30 @@
+{
+	"lines": [
+		{
+			"speakerName": "Prisoner",
+			"sentence": "Huh? Do I know you?",
+			"choices": [
+				{
+					"choiceText": "No, but I'm trying to move some candy... you in?'",
+					"nextLineIndex": 1
+				},
+				{
+					"choiceText": "Oh my mistake, I have the wrong guy...",
+					"nextLineIndex": -1
+				}
+			]
+		},
+		{
+			"speakerName": "Prisoner",
+			"sentence": "Selling candy you say? You should have led with that!",
+			"choices": [],
+			"nextLineIndex": 2
+		},
+		{
+			"speakerName": "Prisoner",
+			"sentence": "Listen up, bring me some candy and I'll have some cash for you.'",
+			"choices": [],
+			"nextLineIndex": -1
+		}
+	]
+}

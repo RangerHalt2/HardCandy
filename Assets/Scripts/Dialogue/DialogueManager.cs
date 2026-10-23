@@ -18,7 +18,7 @@ public class DialogueManager : MonoBehaviour
 
     private Button[] choice_buttons;
 
-    private bool isActive = true;
+    private bool isActive = false;
 
     private Dialogue currentDialogue;
     private int currentLineIndex = 0;
@@ -26,6 +26,7 @@ public class DialogueManager : MonoBehaviour
     private Coroutine typingCoroutine;
 
     private InputHandler input_manager;
+    [HideInInspector] public IDialogueOutcome outcome;
 
     [HideInInspector] public bool isManuallyContinuing = true;
 
@@ -54,8 +55,16 @@ public class DialogueManager : MonoBehaviour
     {
         isActive = true;
         dialogue_canvas.gameObject.SetActive(true);
+        game_canvas.gameObject.SetActive(false);
         currentDialogue = dialog;
         currentLineIndex = 0;
+
+        PlayerController pc = GameObject.FindAnyObjectByType<PlayerController>();
+        pc.blockInputs = true;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         DisplayLine();
     }
 
@@ -187,9 +196,30 @@ public class DialogueManager : MonoBehaviour
     private void EndDialogue()
     {
         Debug.Log("DIALOGUE MANAGER - ending the dialogue");
+        string leadsTo = currentDialogue.lines[currentLineIndex].leadsTo;
         dialogue_canvas.gameObject.SetActive(false);
+        game_canvas.gameObject.SetActive(true);
         isActive = false;
+
+        PlayerController pc = GameObject.FindAnyObjectByType<PlayerController>();
+        pc.blockInputs = false;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        HandleDialogueOutcome();
+
         return;
+    }
+
+    public void HandleDialogueOutcome()
+    {
+        if(outcome == null)
+        {
+            Debug.LogWarning("DIALOGUE MANAGER - the outcome is null; returning.");
+            return;
+        }
+        outcome.Execute();
     }
 
     public Dialogue LoadDialogueFromJSON(TextAsset jsonFile)

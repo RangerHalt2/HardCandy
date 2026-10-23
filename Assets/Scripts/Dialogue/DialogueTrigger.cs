@@ -14,14 +14,22 @@ public class DialogueTrigger : MonoBehaviour
     {
         manager = GetComponent<DialogueManager>();
         if (manager == null) manager = GameObject.FindAnyObjectByType<DialogueManager>();
-        dialog = manager.LoadDialogueFromJSON(dialogueJSON);
+        if(dialogueJSON != null)
+            dialog = manager.LoadDialogueFromJSON(dialogueJSON);
         if (isDialogueOnStart)
             manager.StartDialogue(dialog);
     }
 
-    public void StartDialogue()
+    public void SetDialogueJSON(TextAsset JSON)
+    {
+        dialogueJSON = JSON;
+        dialog = manager.LoadDialogueFromJSON(dialogueJSON);
+    }
+
+    public void StartDialogue(IDialogueOutcome outcome)
     {
         manager.isManuallyContinuing = isManuallyContinuing;
+        manager.outcome = outcome;
         manager.StartDialogue(dialog);
     }
 

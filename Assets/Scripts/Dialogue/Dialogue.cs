@@ -13,6 +13,7 @@ public class DialogueLine
     public string speakerName;
     public string speakerID;
     public string sentence;
+    public string leadsTo;
 
     public string emotion;
     public AudioClip voiceClip; //here just in case we need later
