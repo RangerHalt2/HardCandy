@@ -3,7 +3,17 @@ guid: b4379ea64a7aaf1459637468168749f5
 ModelImporter:
   serializedVersion: 24600
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Prison_Bed_01
+    second: {fileID: 2100000, guid: 50d5f0525ef9e71428784969d44b063e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Prison_Bed_Frame_01
+    second: {fileID: 2100000, guid: a6419412d7b74cd4492a9b5f3ef3e5a2, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -39,6 +39,18 @@ public class DialogueManager : MonoBehaviour
             Button btn = choice_panels[i].GetComponentInChildren<Button>();
             choice_buttons[i] = btn;
         }
+        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include);
+        Debug.Log($"Found {canvases.Length} canvases");
+        foreach (Canvas c in canvases)
+            Debug.Log($"  '{c.name}' (active: {c.gameObject.activeInHierarchy})", c);
+
+        game_canvas = null;
+        foreach (Canvas c in canvases)
+        {
+            if (c.name == "GameCanvas") { game_canvas = c; break; }
+        }
+        Debug.Log("game_canvas = " + (game_canvas != null ? game_canvas.name : "NULL"));
+        dialogue_canvas.enabled = false;
     }
 
     private void Update()
@@ -55,6 +67,7 @@ public class DialogueManager : MonoBehaviour
     {
         isActive = true;
         dialogue_canvas.gameObject.SetActive(true);
+        dialogue_canvas.enabled = true;
         game_canvas.gameObject.SetActive(false);
         currentDialogue = dialog;
         currentLineIndex = 0;
@@ -140,7 +153,6 @@ public class DialogueManager : MonoBehaviour
                 {
                     OnChoicesSelected(currentChoice);
                     //currentLineIndex = nextIndex;
-                    DisplayLine();
                 });
             }
 
@@ -186,6 +198,7 @@ public class DialogueManager : MonoBehaviour
         if (choice.nextLineIndex >= 0)
         {
             currentLineIndex = choice.nextLineIndex;
+            DisplayLine();
         }
         else
         {
