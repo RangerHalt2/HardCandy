@@ -30,6 +30,19 @@ public class DialogueManager : MonoBehaviour
 
     [HideInInspector] public bool isManuallyContinuing = true;
 
+    private static DialogueManager instance;
+
+    private void Awake()
+    {
+        //Only one manager should run. A second one waking up later (e.g. on the dialogue canvas when it gets shown) would hide the dialogue in its Start
+        if (instance != null && instance != this)
+        {
+            enabled = false;
+            return;
+        }
+        instance = this;
+    }
+
     private void Start()
     {
         input_manager = GameObject.FindAnyObjectByType<InputHandler>();
